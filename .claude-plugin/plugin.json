@@ -1,0 +1,15 @@
+{
+  "name": "spore",
+  "displayName": "Spore α",
+  "version": "0.1.0",
+  "description": "Spore α — Markdown-based AI memory harness for Obsidian vaults. Surfaces five slash commands that delegate to doctrine in the per-vault runtime markdown file.",
+  "author": {
+    "name": "NeuromanceCo",
+    "email": "halicon@gmail.com",
+    "url": "https://github.com/neuromance-admin/spore-claudecode-plugin"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/neuromance-admin/spore-claudecode-plugin",
+  "homepage": "https://github.com/neuromance-admin/spore-claudecode-plugin",
+  "keywords": ["memory", "obsidian", "markdown", "ai", "harness", "claude-code"]
+}
