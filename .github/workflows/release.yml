@@ -22,10 +22,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: aarch64-apple-darwin   # Apple Silicon
+          - target: aarch64-apple-darwin   # Apple Silicon (arm64) — the only supported target
             runner: macos-14
-          - target: x86_64-apple-darwin    # Intel Mac
-            runner: macos-13
     steps:
       - uses: actions/checkout@v4
 
@@ -69,7 +67,7 @@ jobs:
       - name: Verify expected assets
         run: |
           set -eu
-          for a in spore-aarch64-apple-darwin spore-x86_64-apple-darwin; do
+          for a in spore-aarch64-apple-darwin; do
             test -f "dist/$a" || { echo "missing asset: $a"; exit 1; }
           done
-          echo "All expected macOS assets present."
+          echo "Expected asset present."

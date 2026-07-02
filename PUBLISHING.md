@@ -47,8 +47,8 @@ git push origin v0.2.0
 ```
 
 That fires `.github/workflows/release.yml`, which:
-1. builds `spore` on `macos-14` (Apple Silicon) and `macos-13` (Intel),
-2. packages each as `spore-<target-triple>` + a `.sha256`,
+1. builds `spore` on `macos-14` (Apple Silicon / arm64 — the only supported target),
+2. packages it as `spore-aarch64-apple-darwin` + a `.sha256`,
 3. creates the GitHub Release and uploads the assets,
 4. verifies the expected asset names are present (guards against drift from `install.sh`).
 
@@ -71,8 +71,9 @@ curl -fsSL https://raw.githubusercontent.com/neuromance-admin/spore-claudecode-p
 
 …which equals the Rust target triple. The workflow names assets `spore-${{ matrix.target }}`, so they line up. If you add a platform, add it to **both** the workflow matrix and `install.sh`'s `case` blocks. The workflow's "Verify expected assets" step is a backstop.
 
-## Not yet included (macOS-first)
+## Not included (by choice / macOS-first)
 
+- **Intel Macs (`x86_64-apple-darwin`)** — intentionally dropped; Spore ships for Apple Silicon only. `install.sh` gives Intel Macs a clear message rather than a 404.
 - **Linux** builds — add `x86_64-unknown-linux-gnu` / `aarch64-unknown-linux-gnu` to the matrix (`install.sh` already handles the names).
 - **Windows** — would need a `.exe` asset + a PowerShell installer.
 - **A double-click GUI installer** (`.pkg`/`.dmg`) — needs Apple Developer ID signing + notarization; deferred by design (`curl | sh` avoids Gatekeeper because curl-downloaded files aren't quarantined).

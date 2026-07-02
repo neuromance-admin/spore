@@ -33,6 +33,10 @@ case "$arch" in
   x86_64|amd64)  arch_tag="x86_64" ;;
   *)             die "unsupported architecture '$arch'" ;;
 esac
+# macOS ships for Apple Silicon (arm64) only.
+if [ "$os" = Darwin ] && [ "$arch_tag" != aarch64 ]; then
+  die "Spore ships for Apple Silicon (arm64) Macs only — this looks like an Intel Mac."
+fi
 # Asset name == the Rust target triple, e.g. spore-aarch64-apple-darwin
 asset="spore-${arch_tag}-${os_tag}"
 
