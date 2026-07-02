@@ -1,0 +1,75 @@
+name: release
+
+# Cut a release: tag the repo `vX.Y.Z` and push the tag —
+#   git tag v0.2.0 && git push origin v0.2.0
+# This builds the macOS binaries and publishes them as release assets named
+# `spore-<target-triple>`, which install.sh downloads. Requires the `spore`
+# crate present at ./spore-helper (synced from the SporeSource workshop).
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch: {}   # allow a manual run from the Actions tab
+
+permissions:
+  contents: write          # needed to create the release + upload assets
+
+jobs:
+  build:
+    name: build ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-apple-darwin   # Apple Silicon
+            runner: macos-14
+          - target: x86_64-apple-darwin    # Intel Mac
+            runner: macos-13
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add Rust target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Build
+        working-directory: spore-helper
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Package + checksum
+        run: |
+          set -eu
+          out="spore-${{ matrix.target }}"
+          cp "spore-helper/target/${{ matrix.target }}/release/spore" "$out"
+          shasum -a 256 "$out" > "$out.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: |
+            spore-${{ matrix.target }}
+            spore-${{ matrix.target }}.sha256
+
+  release:
+    name: publish release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
+
+      # Sanity: fail loudly if the asset names ever drift from what install.sh expects.
+      - name: Verify expected assets
+        run: |
+          set -eu
+          for a in spore-aarch64-apple-darwin spore-x86_64-apple-darwin; do
+            test -f "dist/$a" || { echo "missing asset: $a"; exit 1; }
+          done
+          echo "All expected macOS assets present."

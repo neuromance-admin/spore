@@ -1,6 +1,6 @@
-# Spore α plugin (v0.1.0)
+# Spore α plugin (v0.2.0)
 
-The slash-command UX layer for the **Spore α** runtime — a Markdown-based AI memory harness for Obsidian vaults that runs inside Claude Code.
+The slash-command UX layer for the **Spore α** runtime — a Markdown-based AI memory harness that runs inside Claude Code. As of runtime v0.2 the substrate seam is the self-owned **`spore` helper** (a small local binary), not the Obsidian CLI — Obsidian is now an optional Markdown viewer, no longer a requirement.
 
 This plugin provides five namespaced slash commands:
 
@@ -25,34 +25,48 @@ The plugin commands assume the runtime is in context. If it isn't, the commands 
 
 ## Requirements
 
-- **Obsidian** 1.12+ with the built-in CLI enabled (Settings → General → Command line interface).
+- The **`spore` helper** installed on PATH (via the install bootstrap — the per-user foundation, once). This is the substrate seam the runtime drives.
 - **Claude Code** (Max plan recommended).
-- The **sporeAlpha runtime file** (`_sporeAlpha.v0.1.md` or later) dropped at the root of an Obsidian vault.
+- The **sporeAlpha runtime file** (`_sporeAlpha.v0.2.md` or later) at the root of a vault — dropped by `spore init`, or by hand.
+- **Obsidian is optional** — a nice Markdown viewer for the graph/backlinks, but nothing requires it.
 
 ## Installation
+
+Two one-time steps. **1 — the `spore` helper** (a prebuilt binary; no build tools needed), in a terminal:
+
+```
+curl -fsSL https://raw.githubusercontent.com/neuromance-admin/spore-claudecode-plugin/main/install.sh | sh
+```
+
+It installs to `~/.spore/bin` and puts it on your PATH. Verify with `spore version`. (Developers can build from source instead — see the `spore-helper/` crate.)
+
+**2 — the plugin** (the `/spore:*` slash commands), inside any Claude Code session:
 
 ```
 /plugin marketplace add neuromance-admin/spore-claudecode-plugin
 /plugin install spore@neuromance-co
 ```
 
+Then create a vault with `spore init ~/path/to/MyVault` and hand the runtime to Claude Code.
+
 ## Usage
 
-1. Open your Obsidian vault in Obsidian (with the CLI enabled).
+1. Create a vault with `spore init <path>` (or drop `_sporeAlpha.v0.2.md` into a folder by hand).
 2. Open Claude Code with your vault's root as the working directory.
-3. Hand `_sporeAlpha.v0.1.md` (the runtime in your vault root) to Claude Code — *"read this file"*.
+3. Hand `_sporeAlpha.v0.2.md` (the runtime in your vault root) to Claude Code — *"read this file"*.
 4. On first launch, Spore walks you through a brief first-use dialog (your name, what to call your AI, what this vault is for, whether to stamp the three starter rules). Once done, you're in **Ready** state.
 5. Use the slash commands — or just ask in natural language. *"Save the session"* and `/spore:save` land at the same place.
 
 ## What this plugin does NOT do
 
 - It does not contain the doctrine. The runtime markdown file does. The plugin is a UX layer.
-- It does not modify your vault directly. Every vault write comes from the runtime-defined routines, going through the verb seam (Obsidian CLI), gated by the active-vault guard and read-after-write verification.
+- It does not modify your vault directly. Every vault write comes from the runtime-defined routines, going through the verb seam (the `spore` helper), gated by the helper's structural vault-root guard and read-after-write verification.
 - It does not auto-update the runtime. The runtime is dropped per-vault by the owner; signed-manifest update channel is parked for v0.1.
 
 ## See also
 
-- Runtime source: `_sporeAlpha.v0.1.md` (in any vault you've Spore-ified) — the complete doctrine, 993 lines, 12 sections + Changelog.
+- Runtime source: `_sporeAlpha.v0.2.md` (in any vault you've Spore-ified) — the complete doctrine, ~1080 lines, §1–§13 + Changelog.
+- Seam helper source: `build/sporeAlpha-v0.2/spore-helper/` in the upstream `SporeSource` repo.
 - Design rationale: the upstream `SporeSource` repo.
 
 ## License

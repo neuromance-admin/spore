@@ -1,0 +1,21 @@
+[package]
+name = "spore"
+version = "0.2.0"
+edition = "2021"
+description = "The Spore filesystem seam helper — the deterministic verb executor behind the sporeAlpha runtime."
+license = "MIT"
+
+# Zero external dependencies, by design. Pure std:
+#  - single self-contained binary, no crates.io fetch at build time
+#  - nothing to audit but our own code
+#  - matches Spore's self-owned / minimal-machinery ethos
+[dependencies]
+
+[[bin]]
+name = "spore"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = "z"   # small binary — it starts once per verb; size + startup matter more than throughput
+lto = true
+strip = true
