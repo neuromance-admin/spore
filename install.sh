@@ -1,5 +1,5 @@
 #!/bin/sh
-# Spore α — one-command installer for the `spore` helper (the substrate seam).
+# Spore α — one-command installer for the `spore` binary (the substrate seam).
 #
 #   curl -fsSL https://raw.githubusercontent.com/neuromance-admin/spore/main/install.sh | sh
 #
@@ -92,7 +92,7 @@ if [ "$on_path" -eq 0 ]; then
     *)      profile="$HOME/.profile" ;;
   esac
   if ! grep -qF "$line" "$profile" 2>/dev/null; then
-    printf '\n# Spore helper (spore α)\n%s\n' "$line" >> "$profile"
+    printf '\n# Spore binary (spore α)\n%s\n' "$line" >> "$profile"
     say "Added ~/.spore/bin to PATH in $profile"
   fi
   say "Run:  source $profile   (or open a new terminal) so 'spore' is available."
@@ -108,5 +108,5 @@ Next:
   spore init ~/path/to/MyVault      # create a vault
   # then open Claude Code in that folder and say: "read _sporeAlpha.md"
 
-Uninstall: rm -rf ~/.spore/bin   (and remove the "Spore helper" line from your shell profile)
+Uninstall: rm -rf ~/.spore/bin   (and remove the "Spore binary" line from your shell profile)
 EOF
