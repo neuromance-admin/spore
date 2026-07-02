@@ -1,4 +1,4 @@
-# Publishing the Spore helper (`spore`) — release + one-command install
+# Publishing the Spore binary (`spore`) — release + one-command install
 
 The one-command installer (`install.sh`) downloads a **prebuilt** `spore` binary from this repo's GitHub Releases. This doc is how those binaries get built and published.
 
@@ -8,14 +8,14 @@ The one-command installer (`install.sh`) downloads a **prebuilt** `spore` binary
 spore/
 ├── .claude-plugin/           ← the Claude Code plugin (slash commands)
 ├── skills/                   ← plugin skills
-├── spore-helper/             ← the Rust crate (SEAM binary source) — synced from SporeSource
+├── spore-binary/             ← the Rust crate (SEAM binary source) — synced from SporeSource
 ├── _sporeAlpha.md            ← the runtime — synced from SporeSource; the crate embeds it
 ├── install.sh                ← the one-command installer users curl
 ├── PUBLISHING.md             ← this file
 └── .github/workflows/release.yml
 ```
 
-`spore-helper/` and `_sporeAlpha.md` are authored canonically in the **SporeSource
+`spore-binary/` and `_sporeAlpha.md` are authored canonically in the **SporeSource
 workshop** (`build/sporeAlpha-v0.3/`). They are *synced* into this repo before a release
 (same dual-source discipline as rules/personas). SporeSource stays the source of truth.
 
@@ -31,7 +31,7 @@ From the SporeSource workshop, copy both into the plugin repo (excluding build o
 SRC=/path/to/SporeSource/build/sporeAlpha-v0.3
 DST=/path/to/spore
 
-rsync -a --delete --exclude target/ "$SRC/spore-helper/" "$DST/spore-helper/"
+rsync -a --delete --exclude target/ "$SRC/spore-binary/" "$DST/spore-binary/"
 cp "$SRC/_sporeAlpha.md" "$DST/_sporeAlpha.md"
 ```
 

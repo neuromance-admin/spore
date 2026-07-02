@@ -4,7 +4,7 @@ name: release
 #   git tag v0.2.0 && git push origin v0.2.0
 # This builds the macOS binaries and publishes them as release assets named
 # `spore-<target-triple>`, which install.sh downloads. Requires the `spore`
-# crate present at ./spore-helper (synced from the SporeSource workshop).
+# crate present at ./spore-binary (synced from the SporeSource workshop).
 
 on:
   push:
@@ -31,14 +31,14 @@ jobs:
         run: rustup target add ${{ matrix.target }}
 
       - name: Build
-        working-directory: spore-helper
+        working-directory: spore-binary
         run: cargo build --release --target ${{ matrix.target }}
 
       - name: Package + checksum
         run: |
           set -eu
           out="spore-${{ matrix.target }}"
-          cp "spore-helper/target/${{ matrix.target }}/release/spore" "$out"
+          cp "spore-binary/target/${{ matrix.target }}/release/spore" "$out"
           shasum -a 256 "$out" > "$out.sha256"
 
       - uses: actions/upload-artifact@v4

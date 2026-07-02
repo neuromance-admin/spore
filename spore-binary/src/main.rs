@@ -1,4 +1,4 @@
-//! `spore` — the Spore filesystem seam helper.
+//! `spore` — the Spore filesystem binary (the substrate seam).
 //!
 //! A dumb, deterministic verb executor. It carries no doctrine, decides nothing
 //! about *when* to write, and performs no auto-anything — all judgment stays in
@@ -123,7 +123,7 @@ fn parse_args() -> Result<Cli> {
 }
 
 const USAGE: &str = "\
-spore — the Spore filesystem seam helper
+spore — the Spore filesystem binary (the substrate seam)
 
 USAGE:
   spore [--vault <root>] <verb> [key=value ...]

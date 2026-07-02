@@ -1,5 +1,5 @@
 //! Read-only queries: search, frontmatter-query, tags. All driven by the
-//! helper's own recursive file walk — no external `grep`/ripgrep dependency.
+//! binary's own recursive file walk — no external `grep`/ripgrep dependency.
 //!
 //! The runtime file, refresh backups (`_sporeAlpha.md.bak-*`) and the transient
 //! `_sporeAlpha.shedding.tmp` are excluded from every walk, so the §7

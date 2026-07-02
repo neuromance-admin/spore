@@ -8,7 +8,7 @@
 //! in scope.
 //!
 //! Decision ladder:
-//!   engine < vault           → refuse (downgrade guard; update the helper)
+//!   engine < vault           → refuse (downgrade guard; update the binary)
 //!   engine == vault, !force  → no-op ("already current")
 //!   engine == vault, force   → re-stamp (recovery: restores the shed scaffold)
 //!   engine > vault           → back up, then stamp the embedded seed
@@ -64,7 +64,7 @@ pub fn refresh(target: Option<PathBuf>, force: bool) -> Result<()> {
         return Err(SporeError::new(
             ErrKind::State,
             format!(
-                "downgrade refused: this vault's runtime is v{} but the helper carries v{} — update the spore helper first",
+                "downgrade refused: this vault's runtime is v{} but the binary carries v{} — update the spore binary first",
                 vault_ver, engine_ver
             ),
         ));

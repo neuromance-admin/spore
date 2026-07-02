@@ -2,6 +2,6 @@
 .DS_Store
 **/.DS_Store
 
-# Rust build output (the helper ships as a prebuilt release binary, not from tree)
-/spore-helper/target/
+# Rust build output (the binary ships as a prebuilt release binary, not from tree)
+/spore-binary/target/
 target/

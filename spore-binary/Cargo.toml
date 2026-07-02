@@ -1,8 +1,8 @@
 [package]
 name = "spore"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
-description = "The Spore filesystem seam helper — the deterministic verb executor behind the sporeAlpha runtime."
+description = "The spore binary (the substrate seam) — the deterministic verb executor behind the sporeAlpha runtime."
 license = "MIT"
 
 # Zero external dependencies, by design. Pure std:
