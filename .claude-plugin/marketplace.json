@@ -9,8 +9,8 @@
     {
       "name": "spore",
       "source": "./",
-      "version": "0.1.0",
-      "description": "Spore α — Markdown-based AI memory harness for Obsidian vaults. Surfaces five slash commands that delegate to doctrine in the per-vault runtime markdown file."
+      "version": "0.2.0",
+      "description": "Spore α — Markdown-based AI memory harness. Surfaces five slash commands that delegate to doctrine in the per-vault runtime markdown file."
     }
   ]
 }
