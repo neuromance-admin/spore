@@ -20,4 +20,4 @@ On cancel → nothing changes.
 
 If the sporeAlpha runtime is not loaded:
 
-> "The Spore runtime isn't loaded — hand `_sporeAlpha.v*.md` (in your vault root) to Claude Code first, then re-run `/spore:map-rebuild`."
+> "The Spore runtime isn't loaded — hand `_sporeAlpha.md` (in your vault root) to Claude Code first, then re-run `/spore:map-rebuild`."

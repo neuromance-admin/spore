@@ -14,4 +14,4 @@ The owner has invoked `/spore:inbox`. Work the vault's Inbox per the Spore desig
 
 If the sporeAlpha runtime is not loaded:
 
-> "The Spore runtime isn't loaded — hand `_sporeAlpha.v*.md` (in your vault root) to Claude Code first, then re-run `/spore:inbox`."
+> "The Spore runtime isn't loaded — hand `_sporeAlpha.md` (in your vault root) to Claude Code first, then re-run `/spore:inbox`."

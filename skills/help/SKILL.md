@@ -17,12 +17,13 @@ If the sporeAlpha runtime is not loaded in this session, render this fallback li
 ```
 sporeAlpha is not loaded in this session.
 
-To start: hand `_sporeAlpha.v*.md` (the runtime in your vault root) to Claude Code.
+To start: hand `_sporeAlpha.md` (the runtime in your vault root) to Claude Code.
 
 Once loaded, these commands are available:
   /spore:save        — save the session
   /spore:rules       — view or manage this vault's rules
   /spore:inbox       — work this vault's Inbox
   /spore:map-rebuild — rebuild the Map from session history
+  /spore:refresh     — update this vault's runtime to the one the helper carries
   /spore:help        — this help
 ```

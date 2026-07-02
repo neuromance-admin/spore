@@ -1,9 +1,9 @@
 //! Read-only queries: search, frontmatter-query, tags. All driven by the
 //! helper's own recursive file walk — no external `grep`/ripgrep dependency.
 //!
-//! The runtime file(s) and the transient `_sporeAlpha.shedding.tmp` are excluded
-//! from every walk, so the §7 search-exclusion is enforced by the tool and the
-//! AI can never forget it.
+//! The runtime file, refresh backups (`_sporeAlpha.md.bak-*`) and the transient
+//! `_sporeAlpha.shedding.tmp` are excluded from every walk, so the §7
+//! search-exclusion is enforced by the tool and the AI can never forget it.
 
 use crate::frontmatter;
 use crate::Result;
@@ -12,9 +12,11 @@ use std::path::{Path, PathBuf};
 
 /// Names the walk always skips.
 fn is_excluded(name: &str) -> bool {
-    crate::vault::is_runtime_file(name)          // _sporeAlpha.v*.md
-        || name == "_sporeAlpha.shedding.tmp"    // transient shed temp
-        || name.starts_with(".spore-tmp-")       // our own write temps
+    crate::vault::is_runtime_file(name)               // _sporeAlpha.md (frozen)
+        || name.starts_with("_sporeAlpha.md.bak")     // refresh backups (full runtime copies)
+        || name.starts_with("_sporeAlpha.v")          // stale versioned runtimes (pre-freeze)
+        || name == "_sporeAlpha.shedding.tmp"         // transient shed temp
+        || name.starts_with(".spore-tmp-")            // our own write temps
 }
 
 fn is_hidden_dir(name: &str) -> bool {
@@ -157,7 +159,9 @@ mod tests {
 
     #[test]
     fn excludes_runtime_and_temps() {
-        assert!(is_excluded("_sporeAlpha.v0.2.md"));
+        assert!(is_excluded("_sporeAlpha.md")); // frozen canonical runtime
+        assert!(is_excluded("_sporeAlpha.md.bak-0.2.0")); // refresh backup
+        assert!(is_excluded("_sporeAlpha.v0.2.md")); // stale pre-freeze runtime
         assert!(is_excluded("_sporeAlpha.shedding.tmp"));
         assert!(is_excluded(".spore-tmp-123-x.md"));
         assert!(!is_excluded("Map.md"));

@@ -1,12 +1,12 @@
 ---
 schemaVersion: 1
-version: 0.2.0
+version: 0.3.0
 codename: sporeAlpha
 stage: seed
-minHelper: 0.2.0
+minHelper: 0.3.0
 ---
 
-# Spore α Runtime — v0.2.0
+# Spore α Runtime — v0.3.0
 
 > You are reading the Spore runtime. This file teaches you (the AI) how to be a Spore harness for the owner who launched it. The file ships identity-free — the same bytes for every Spore install. Your *identity* (who you are, who the owner is) lives in `~/.spore/personas/`. The *vault* you're working in lives around this file — its memory, its rules, its sessions.
 
@@ -119,7 +119,7 @@ The ordered steps you run on every launch.
 
 ### Step 0 — Preconditions
 
-Verify substrate availability before reading anything. Run `spore version` (the helper prints its semver + the runtime `schemaVersion` range it supports) and check it against this runtime's frontmatter — the **version handshake**.
+Verify substrate availability before reading anything. Run `spore version` (the helper prints its semver, the runtime `schemaVersion` range it supports, and the semantic version of the runtime it carries baked in — `runtime-version`) and check it against this runtime's frontmatter — the **version handshake**. Keep the reported `runtime-version` in mind: Step 5 compares it against this runtime's `version` for the (non-blocking) currency notice.
 
 | State | Action |
 |---|---|
@@ -132,7 +132,7 @@ There is no "is Obsidian running" check — the seam is a local binary, not an a
 
 ### Step 1 — The helper resolves to this runtime's home vault
 
-The **home vault** is the directory containing this runtime file. The `spore` helper resolves *the* vault by walking up from the working directory to the nearest `_sporeAlpha.v*.md`. Step 1 confirms that resolution lands on this runtime's own directory — i.e. Claude Code is running inside this vault.
+The **home vault** is the directory containing this runtime file. The `spore` helper resolves *the* vault by walking up from the working directory to the nearest `_sporeAlpha.md`. Step 1 confirms that resolution lands on this runtime's own directory — i.e. Claude Code is running inside this vault.
 
 1. Determine the home vault path from this runtime file's location on disk.
 2. Run `vault` (verb seam → `spore vault`).
@@ -142,7 +142,7 @@ The **home vault** is the directory containing this runtime file. The `spore` he
 |---|---|
 | `vault` path == home vault path | Continue to Step 2 |
 | `vault` path ≠ home vault path | ⏸ Substrate ASK — *"I'm resolving a different vault than the one this runtime lives in. Start Claude Code with `<home-vault-name>` as the working directory, then say so."* On owner confirmation → re-run Step 1 |
-| `vault` finds no vault (no `_sporeAlpha.v*.md` here or in any ancestor) | ⏸ Substrate ASK — *"Run Claude Code from inside `<home-vault-name>` (the folder holding this runtime), then say so."* |
+| `vault` finds no vault (no `_sporeAlpha.md` here or in any ancestor) | ⏸ Substrate ASK — *"Run Claude Code from inside `<home-vault-name>` (the folder holding this runtime), then say so."* |
 
 The **vault-root guard** covers the rest of the session: the home vault root is the canonical write boundary, and the helper refuses any write whose path escapes it (§7). There is no "active vault" to drift and nothing to switch — the vault is wherever this runtime lives.
 
@@ -157,7 +157,7 @@ Read `~/.spore/personas/`.
 | `~/.spore/personas/AI/<name>.md` unreadable / malformed | 🛑 State integrity STOP |
 | One AI file + one owner file present | Load both. AI name comes from the AI filename; owner name comes from the owner filename. Continue to Step 3 |
 
-Both persona files are name-based: `AI/<AI Name>.md` and `Owner/<Owner Name>.md` (filename equals the name; spaces preserved). Discover each by single-file glob of its folder. At v0.2 we expect exactly one file in each — multi-AI menu logic is deferred to a later version.
+Both persona files are name-based: `AI/<AI Name>.md` and `Owner/<Owner Name>.md` (filename equals the name; spaces preserved). Discover each by single-file glob of its folder. At v0.3 we expect exactly one file in each — multi-AI menu logic is deferred to a later version.
 
 **Legacy migration (one-time):** if `~/.spore/personas/Owner/owner.md` exists and no other `Owner/*.md` does, it predates name-based owner files. Read its H1 for the owner name, `rename` it to `Owner/<Owner Name>.md` through the seam, then continue. (Owner files created under v0.1.0 were fixed-named `owner.md`; name-based owner files arrived in v0.1.1.)
 
@@ -202,7 +202,7 @@ Two constraints contradict and cannot both be honoured this session.
   Rule B: <path>
     <one-line summary>
 
-No silent winner. No waivers at v0.2.
+No silent winner. No waivers at v0.3.
 
 Options:
   1. Open A for editing
@@ -222,7 +222,16 @@ Render the splash (§5) followed by the handshake line. Enter **Ready** state.
 
 **Post-setup shed (automatic).** Reaching this step means the vault is set up — personas loaded, Map present, handshake rendered. So if `stage: seed`, perform shedding now (the ritual in §13) and announce it, *before* handing off to conversation. In the common case this is the first launch right after §4 setup; it also self-heals — if an earlier shed was interrupted and left the runtime `seed`, the next launch to reach this step sheds it. A `stage: established` runtime has already shed; do nothing.
 
-After the handshake renders (and any shed has run and been announced), commands (§6) and natural-language conversation flow from here.
+**Runtime currency notice (non-blocking).** Compare the helper's baked `runtime-version` (captured at Step 0) against this runtime's `version` frontmatter. If the helper carries a **newer** runtime, print — after the handshake and any shed announcement, never before:
+
+```
+🌱 A newer runtime is available (v<helper's runtime-version>; this vault is on v<this file's version>).
+   Run /spore:refresh to update this vault.
+```
+
+This notice **informs, it never forces**: it does not halt boot, does not prompt for a decision, does not repeat itself mid-session, and nothing updates without the owner running `/spore:refresh` themselves (§6). If the versions match — or the helper's is *older* (the vault is ahead; `spore refresh` guards that case itself) — print nothing.
+
+After the handshake renders (and any shed has run and been announced, and any currency notice printed), commands (§6) and natural-language conversation flow from here.
 
 ---
 
@@ -349,7 +358,7 @@ The splash renders **once per session start**, at the first user-facing moment �
  ( · · · )    \___ \| '_ \ / _ \| '__/ _ \   
   '-----'      ___) | |_) | (_) | | |  __/  α
     |||       |____/| .__/ \___/|_|  \___|
-    |_|             |_|                v0.2.0
+    |_|             |_|                v0.3.0
 ```
 
 The mushroom is the spore-bearer — a quiet biological wink at what Spore actually is. The `α` marks this as the alpha line (sporeAlpha, restarting at v0.1). The version sits at the bottom-right and is replaced when the runtime is dropped in for a new version.
@@ -384,7 +393,10 @@ If the plugin isn't installed, you (the AI) still recognise the same text patter
 - `/spore:rules` — View or manage this vault's rules. (§9)
 - `/spore:inbox` — Work this vault's Inbox: list contents, propose filing, write on consent. Passive otherwise.
 - `/spore:map-rebuild` — Rebuild the Map from session history with ⏸ preview. (§10)
+- `/spore:refresh` — Update this vault's runtime to the newer one the `spore` helper carries. Backs up the old runtime first; touches nothing else. Runs `spore refresh` — the helper compares versions, no-ops if current, refuses downgrades.
 - `/spore:help` — Show the command list, with a state-aware header.
+
+**`/spore:refresh` discipline.** The helper owns the entire file operation — never hand-write runtime content yourself (Hard Floor #2). Relay the helper's outcome verbatim: refreshed (report old → new version + backup path, and note the new runtime applies on next launch), already current, or refused (downgrade — direct the owner to update the helper via its installer). After a successful refresh, finish the current session normally on the runtime already in context; the next launch boots the new one.
 
 ### `/spore:help` derivation
 
@@ -394,7 +406,7 @@ When the owner runs `/spore:help` (or asks in natural language *"what can I do"*
 2. **Quote the entries verbatim** — do not rephrase the descriptions.
 3. Prepend a one-line **state header** based on current session state.
 
-**Two contexts at v0.2:**
+**Two contexts at v0.3:**
 
 | Context | Output |
 |---|---|
@@ -407,14 +419,14 @@ Richer context-awareness (e.g. highlighting `/spore:rules` mid-collision) is def
 
 Add a command to this section → next session's `/spore:help` shows it. Remove one → gone. Change a description → reflected verbatim. **No parallel list anywhere** — the runtime is the single source of truth.
 
-### What's deliberately NOT in v0.2
+### What's deliberately NOT in v0.3
 
 - `/spore:help <command>` for per-command deep-dive (owner can ask in natural language).
 - Per-context command highlighting based on state.
 - Dynamic command insertion or hiding based on state.
-- `/spore:ai` for persona switching — single AI at v0.2, no menu.
+- `/spore:ai` for persona switching — single AI at v0.3, no menu.
 - `/spore:mount` — the runtime is in the vault by construction; mount happens at launch.
-- `/spore:update` — manual drop-and-replace for now; signed-manifest update channel parked.
+- A signed-manifest update channel — `/spore:refresh` re-stamps the runtime the locally-installed helper carries (trust rides on how the helper itself was installed); a signed remote channel remains parked.
 
 ---
 
@@ -422,7 +434,7 @@ Add a command to this section → next session's `/spore:help` shows it. Remove 
 
 **This is the only section of the runtime that names a backend.** All vault interaction routes through these abstract verbs (Hard Floor #3). The verbs are the runtime's vocabulary; the right-hand column is the current substrate (the `spore` filesystem helper). Swap the right column to change backends — the runtime body stays the same.
 
-**Substrate fact that shapes every verb:** the `spore` helper resolves *the* vault from this runtime's location on disk — it walks up from the working directory to the directory containing `_sporeAlpha.v*.md`, and that directory is the vault root. There is no "active vault" to select and no router argument. The helper **guards every write to resolve inside that root** and refuses any path that escapes it — so Hard Floor #1 is enforced structurally, in the tool, not as a step you remember to perform. (Pass `--vault <root>` to address a specific vault explicitly; without it, resolution-from-cwd is the norm.)
+**Substrate fact that shapes every verb:** the `spore` helper resolves *the* vault from this runtime's location on disk — it walks up from the working directory to the directory containing `_sporeAlpha.md`, and that directory is the vault root. There is no "active vault" to select and no router argument. The helper **guards every write to resolve inside that root** and refuses any path that escapes it — so Hard Floor #1 is enforced structurally, in the tool, not as a step you remember to perform. (Pass `--vault <root>` to address a specific vault explicitly; without it, resolution-from-cwd is the norm.)
 
 ### Verb table
 
@@ -457,7 +469,7 @@ Two helper commands sit *outside* the seam (cold-start / metadata, no vault inte
 
 **Runtime self-modification happens only via the germination shed (§13).** That shed runs in the germination phase (Hard Floor #2, #3), so it uses ordinary file operations rather than the seam: write the established form to a temp file, verify, then atomically rename it over the canonical path. The atomic rename is crash-safe (the canonical path is never half-written), and no local copy of the full form is kept — recovery is a source re-drop. In the established phase the runtime file is never a write target — full stop.
 
-**Runtime files are excluded from `search` automatically.** The runtime's *body* mentions `ruleScope`, `mapType`, and other frontmatter keys in §9, §10, §11 as documentation — a naive free-text `search` would match the runtime itself and return the wrong thing. The `spore` helper omits the runtime file(s) (`_sporeAlpha.v*.md`), the transient `_sporeAlpha.shedding.tmp` (exists only during a shed, §13), and its own write temps from every walk — so you don't filter results yourself; the tool does. **`frontmatter-query name=K` needs no exclusion anyway** — it matches only files whose *frontmatter* has key K, and the runtime's frontmatter carries none of the documented keys (only `schemaVersion`/`version`/`codename`/`stage`/`minHelper`).
+**Runtime files are excluded from `search` automatically.** The runtime's *body* mentions `ruleScope`, `mapType`, and other frontmatter keys in §9, §10, §11 as documentation — a naive free-text `search` would match the runtime itself and return the wrong thing. The `spore` helper omits the runtime file (`_sporeAlpha.md`), runtime backups (`_sporeAlpha.md.bak-*`, left by `spore refresh`), the transient `_sporeAlpha.shedding.tmp` (exists only during a shed, §13), and its own write temps from every walk — so you don't filter results yourself; the tool does. **`frontmatter-query name=K` needs no exclusion anyway** — it matches only files whose *frontmatter* has key K, and the runtime's frontmatter carries none of the documented keys (only `schemaVersion`/`version`/`codename`/`stage`/`minHelper`).
 
 **No "active vault" to switch.** The vault is resolved from this runtime's location on disk, not from any app's focus — there is nothing to switch and no drift to guard against beyond the path guard above. If the helper resolves a *different* vault than this runtime's home (Claude Code launched from the wrong directory), that surfaces at §3 Step 1; you ASK the owner to relaunch from the vault — you do not act.
 
@@ -629,7 +641,7 @@ loadPriority: 1              # integer, ascending
 
 `ruleScope` may be a single string or a list (single-element list is fine; keeps the type stable for queries).
 
-`loadPriority` orders *compatible* rules. It does **not** resolve contradictions — contradictions surface via the collision block (§3 Step 4); the owner decides; you do not silently pick a winner by priority or specificity. **No waivers at v0.2.**
+`loadPriority` orders *compatible* rules. It does **not** resolve contradictions — contradictions surface via the collision block (§3 Step 4); the owner decides; you do not silently pick a winner by priority or specificity. **No waivers at v0.3.**
 
 The "Origin" paragraph is convention, not enforcement — a useful trail of why a rule exists.
 
@@ -639,7 +651,7 @@ When a behaviour pattern recurs across sessions and would be better as a fired-t
 
 The proposal is conversational — name the pattern, sketch the trigger, ask the owner to review. On consent → write the rule file via the verb seam, read-after-write verified. Boot Step 4 re-sweeps; the new rule loads and the collision check runs against it.
 
-The starter rules shipped in §11 are the v0.2 baseline; vault-specific rules accrete from there.
+The starter rules shipped in §11 are the v0.3 baseline; vault-specific rules accrete from there.
 
 ---
 
@@ -749,13 +761,13 @@ Most drift self-heals through the regen policy:
 | `Map.md` unreadable / corrupted frontmatter | 🛑 State integrity STOP with instruction to run `/spore:map-rebuild` |
 | `Map.md` exists at vault root but `mapType ≠ spore` | Not-a-Spore-vault; ⏸ ASK owner to convert (§3 Step 3) |
 | Owner hand-edited Purpose | No action — Purpose is owner-authored by design |
-| Owner hand-edited Threads between saves | Out of pattern. Threads is runtime-written. If the owner wants to add/change a thread, they ask you. Not detected at v0.2. |
+| Owner hand-edited Threads between saves | Out of pattern. Threads is runtime-written. If the owner wants to add/change a thread, they ask you. Not detected at v0.3. |
 
 ---
 
 ## 11. Starter Rules
 
-These three rules are the v0.2 starter set, **embedded as canonical text** below. On vault first-boot (§4 Moment 2), they're offered to the owner — on consent, you write each one as a separate file into `<vault>/Rules/` via the verb seam, read-after-write verified.
+These three rules are the v0.3 starter set, **embedded as canonical text** below. On vault first-boot (§4 Moment 2), they're offered to the owner — on consent, you write each one as a separate file into `<vault>/Rules/` via the verb seam, read-after-write verified.
 
 After stamping, they're vault content like any other rule — editable, deletable, customisable. They're seeds, not locks.
 
@@ -1041,7 +1053,7 @@ The shed runs in the germination phase, so it uses ordinary file operations rath
 
 1. **Build** the established-form text in memory (kept sections + the three touch-ups).
 2. **Write** the established form to a temp file beside the runtime (`<vault>/_sporeAlpha.shedding.tmp`), flush, and **read-back verify** it matches what you built. Mismatch → 🛑 Operation failure STOP; the live runtime is untouched, nothing lost, stays seed.
-3. **Atomically rename** the temp over the canonical path (`_sporeAlpha.shedding.tmp` → `_sporeAlpha.v0.2.md`). An atomic rename is all-or-nothing: the canonical path holds either the full form or the established form at every instant, never a half-written brick — and the full form's bytes are gone the moment it completes, by design.
+3. **Atomically rename** the temp over the canonical path (`_sporeAlpha.shedding.tmp` → `_sporeAlpha.md`). An atomic rename is all-or-nothing: the canonical path holds either the full form or the established form at every instant, never a half-written brick — and the full form's bytes are gone the moment it completes, by design.
 4. **Read-back verify** the canonical path now holds the established form (`stage: established`). Mismatch → 🛑 Operation failure STOP; report state plainly.
 
 Boot Step 1 already confirmed the vault, and the shed writes to the runtime's own resolved paths on disk, so it cannot land in the wrong vault (Hard Floor #1). This session continues on the full runtime already in context; the next launch loads the established form.
@@ -1050,7 +1062,7 @@ Boot Step 1 already confirmed the vault, and the shed writes to the runtime's ow
 
 ### Recovery / re-setup
 
-To re-run first-use setup or restore the embedded templates: **re-drop the full runtime** from its source over `_sporeAlpha.v0.2.md` (or run `spore init` into a fresh vault). The shed keeps no local copy of the full form, by design — the source drop *is* the recovery path. A re-dropped full runtime is `stage: seed` again — germination is available, and it will shed again after the next successful setup.
+To re-run first-use setup or restore the embedded templates: **re-drop the full runtime** from its source over `_sporeAlpha.md` — the easiest way is `spore refresh force=1`, which re-stamps the seed the helper carries (backing up the current file first); alternatives are a manual drop from source or `spore init` into a fresh vault. The shed keeps no local copy of the full form, by design — the source drop *is* the recovery path. A re-dropped full runtime is `stage: seed` again — germination is available, and it will shed again after the next successful setup.
 
 ### Established-form recovery stub
 
@@ -1059,12 +1071,14 @@ When building the established form, **this entire §13 is replaced by exactly**:
 ```markdown
 ## 13. Established form
 
-This runtime has shed its setup scaffold (§4 First-Use Flows, §11 Starter Rules, §12 Persona Templates) — it is the compacted, installed form (`stage: established`). To re-run setup or restore the embedded templates, re-drop the full runtime from its source over this file.
+This runtime has shed its setup scaffold (§4 First-Use Flows, §11 Starter Rules, §12 Persona Templates) — it is the compacted, installed form (`stage: established`). To re-run setup or restore the embedded templates, re-drop the full runtime from its source over this file (`spore refresh force=1` re-stamps the seed the helper carries, backing this file up first).
 ```
 
 ---
 
 ## Changelog
+
+**v0.3.0** (2026-07-02) — **Runtime refresh for existing vaults + frozen runtime filename.** The per-vault runtime previously had no update path: re-installing the helper baked a newer runtime into the *binary*, but existing vaults kept their old copy with nothing to tell the owner. This release closes that gap with a detect → notify → act chain, resting on the identity-free principle (the runtime carries nothing vault-specific, so replacing it is a file *swap*, never a merge — Map/Rules/Sessions/Inbox/personas are never in scope). **Detect:** `spore version` now also reports the semantic version of the runtime it carries (`runtime-version`), parsed from its embedded copy. **Notify:** new §3 Step 5 *runtime currency notice* — after the handshake (and any shed), boot compares the helper's `runtime-version` against this file's `version`; if the helper carries newer, a **non-blocking** 🌱 line points at `/spore:refresh`. It informs and never forces — no halt, no prompt, no auto-update. **Act:** new helper verb **`spore refresh`** (surfaced as `/spore:refresh`, §6) — compares versions, no-ops when current, **refuses downgrades**, then backs the old runtime up (`_sporeAlpha.md.bak-<oldversion>`) and stamps the embedded seed via the same atomic + read-back-verified write path as `init`; `force=1` bypasses the same-version no-op (the §13 recovery path — restores the shed scaffold). Stamping a *seed* over an established vault is safe by construction: §4 setup fires only on missing state, so a set-up vault skips it and the seed auto-re-sheds at §3 Step 5 (§13's self-heal). **Filename frozen:** the canonical runtime path is now **`_sporeAlpha.md`** (version suffix dropped; version lives in frontmatter + `spore version`) — so every future refresh is a clean single-file overwrite and the two-runtime-file ambiguity can never occur; the helper resolves vaults by the frozen name only (no legacy `_sporeAlpha.v*.md` handling — nothing was deployed). Search-exclusion extended to runtime backups (`_sporeAlpha.md.bak-*`). §6's parked "update channel" note reworded: `/spore:refresh` is the local re-stamp path; a signed remote channel stays parked. `minHelper` → 0.3.0 (older helpers can't resolve the frozen name). Design + rationale: `design-runtime-refresh.md` in this build folder.
 
 **v0.2.0** (2026-07-02) — **Seam swap: Obsidian CLI → the self-owned `spore` filesystem helper.** The substrate seam (§7) now points at a small dependency-free Rust binary (`spore`) instead of the Obsidian CLI — dropping the Obsidian app/CLI as a hard dependency and removing the "active vault" model entirely. Two owner drivers, one root cause: the Obsidian dependency and the active-vault friction were both properties of the Obsidian CLI's single-active-vault addressing, not of the vault's Markdown files. **Storage is unchanged — memory stays plain-text Markdown; no database.** This was designed as a seam swap: the runtime *body* is substrate-agnostic, so the changes are concentrated in the places that named a backend. **§7** — right column rewritten to `spore` commands; the "substrate fact" now describes vault-resolution-from-runtime-location (walk up to `_sporeAlpha.v*.md`) with the vault-root guard enforced *inside the helper*; content passes via stdin (`content=-`); wikilink integrity on move/rename is now the helper's job; the runtime-file search-exclusion is tool-enforced. **§3 Step 0** — Obsidian-on-PATH/running/version checks replaced by a `spore` presence + **version handshake** (`spore version` vs the new `minHelper` frontmatter). **§3 Step 1** — "active vault == home vault" replaced by "the helper resolves to this runtime's home"; the GUI-switch ASK is gone. **§2 Hard Floor** — #1 reframed from "active mount" to "every write path resolves inside the vault root, enforced by the helper" (now *structural*, not disciplinary); #3/#6 and the Category-A STOP triggers reworded off Obsidian. **§8.5** link-integrity attributed to the seam; **§8** recovery note de-Obsidian'd (OS backup + optional git; Obsidian an optional viewer). **New cold-start:** `spore init` stamps the embedded runtime into a fresh vault (kills the manual file-copy); `spore version` drives the handshake. New three-tier install model (per-user machinery `~/.spore/bin/spore` + plugin / per-user identity `~/.spore/personas/` / per-vault). **Obsidian demoted to an optional Markdown viewer.** New `minHelper` frontmatter field. The two-phase seed/established lifecycle (§13) and the Hard Floor's germination/established phasing carry over unchanged; the shed's canonical path is now `_sporeAlpha.v0.2.md`.
 

@@ -20,6 +20,7 @@ mod frontmatter;
 mod init;
 mod links;
 mod query;
+mod refresh;
 mod vault;
 
 /// Categorised failure. The message on stderr + a non-zero exit is what the
@@ -141,9 +142,13 @@ SEAM VERBS (operate on the resolved vault):
   property-set      path=P key=K value=V surgical frontmatter write (preserves other keys)
   property-remove   path=P key=K         surgical frontmatter delete
 
-COLD-START / METADATA (no vault required):
-  init  [path]                           stamp a new vault with the runtime
-  version                                print binary version + supported runtime schema
+COLD-START / MAINTENANCE / METADATA:
+  init  [path] [force=1]                 stamp a new vault with the runtime
+  refresh [path] [force=1]               update the vault's runtime to the one this
+                                         binary carries (backs up first; no-op when
+                                         current; refuses downgrade; force re-stamps)
+  version                                print binary version + supported runtime
+                                         schema + embedded runtime version
 
 Content of `content=-` is read from stdin.";
 
@@ -184,6 +189,15 @@ fn run() -> Result<()> {
         "init" => {
             let target = cli.positionals.first().cloned();
             return init::init(target, cli.kvs.contains_key("force"));
+        }
+        "refresh" => {
+            // Vault from positional path, --vault, or walk-up from cwd.
+            let target = cli
+                .positionals
+                .first()
+                .map(PathBuf::from)
+                .or(cli.vault_override.clone());
+            return refresh::refresh(target, cli.kvs.contains_key("force"));
         }
         _ => {}
     }

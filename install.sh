@@ -106,7 +106,7 @@ cat <<EOF
 
 Next:
   spore init ~/path/to/MyVault      # create a vault
-  # then open Claude Code in that folder and say: "read _sporeAlpha.v0.2.md"
+  # then open Claude Code in that folder and say: "read _sporeAlpha.md"
 
 Uninstall: rm -rf ~/.spore/bin   (and remove the "Spore helper" line from your shell profile)
 EOF

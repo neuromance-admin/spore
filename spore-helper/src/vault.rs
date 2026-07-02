@@ -1,17 +1,24 @@
 //! Vault resolution and the path-containment guard.
 //!
-//! The vault root is the directory containing a runtime file (`_sporeAlpha.v*.md`).
-//! It is resolved by walking up from cwd (or taken from `--vault`). Every path a
-//! verb touches is guarded: it must resolve *inside* the root. This makes Hard
-//! Floor #1 structural — the tool will not cross the boundary.
+//! The vault root is the directory containing the runtime file (`_sporeAlpha.md`
+//! — the frozen canonical name, v0.3+). It is resolved by walking up from cwd
+//! (or taken from `--vault`). Every path a verb touches is guarded: it must
+//! resolve *inside* the root. This makes Hard Floor #1 structural — the tool
+//! will not cross the boundary.
 
 use crate::{ErrKind, Result, SporeError};
 use std::path::{Component, Path, PathBuf};
 
-/// A file is a runtime iff it is named `_sporeAlpha.v<something>.md`.
-/// The transient `_sporeAlpha.shedding.tmp` is deliberately excluded.
+/// The frozen canonical runtime filename (v0.3+). The version lives in the
+/// file's frontmatter and in `spore version` — never in the name, so a refresh
+/// is always a clean single-file overwrite.
+pub const RUNTIME_FILENAME: &str = "_sporeAlpha.md";
+
+/// A file is a runtime iff it carries exactly the frozen name. Versioned names
+/// (`_sporeAlpha.v*.md`), refresh backups (`_sporeAlpha.md.bak-*`) and the
+/// transient `_sporeAlpha.shedding.tmp` are deliberately not runtimes.
 pub fn is_runtime_file(name: &str) -> bool {
-    name.starts_with("_sporeAlpha.v") && name.ends_with(".md")
+    name == RUNTIME_FILENAME
 }
 
 fn dir_has_runtime(dir: &Path) -> bool {
@@ -34,7 +41,7 @@ pub fn resolve(override_root: Option<&Path>) -> Result<PathBuf> {
         if !dir_has_runtime(&abs) {
             return Err(SporeError::new(
                 ErrKind::State,
-                format!("no runtime file (_sporeAlpha.v*.md) in {}", abs.display()),
+                format!("no runtime file (_sporeAlpha.md) in {}", abs.display()),
             ));
         }
         return Ok(abs);
@@ -51,7 +58,7 @@ pub fn resolve(override_root: Option<&Path>) -> Result<PathBuf> {
             None => {
                 return Err(SporeError::new(
                     ErrKind::State,
-                    "not inside a Spore vault (no _sporeAlpha.v*.md found in this directory or any ancestor)"
+                    "not inside a Spore vault (no _sporeAlpha.md found in this directory or any ancestor)"
                         .to_string(),
                 ));
             }
@@ -146,6 +153,14 @@ pub fn guard(root: &Path, arg: &str) -> Result<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn runtime_name_is_frozen() {
+        assert!(is_runtime_file("_sporeAlpha.md"));
+        assert!(!is_runtime_file("_sporeAlpha.v0.2.md")); // versioned names are not runtimes (v0.3 freeze, no legacy)
+        assert!(!is_runtime_file("_sporeAlpha.md.bak-0.2.0")); // refresh backups are not runtimes
+        assert!(!is_runtime_file("_sporeAlpha.shedding.tmp"));
+    }
 
     #[test]
     fn normalize_resolves_dotdot() {

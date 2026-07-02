@@ -1,6 +1,6 @@
 [package]
 name = "spore"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description = "The Spore filesystem seam helper — the deterministic verb executor behind the sporeAlpha runtime."
 license = "MIT"

@@ -2,24 +2,41 @@
 //!
 //! `init` stamps the embedded canonical runtime into a new vault (it does NOT
 //! germinate — personas/Purpose/rules need owner consent in-session, §4 of the
-//! runtime). `version` drives the boot version handshake (§3 Step 0).
+//! runtime). `version` drives the boot version handshake (§3 Step 0) and the
+//! runtime currency notice (§3 Step 5): `runtime-version` is the semantic
+//! version of the runtime baked into this binary, parsed from its frontmatter.
 
+use crate::vault::RUNTIME_FILENAME;
 use crate::{ErrKind, Result, SporeError};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
 /// The canonical runtime, embedded at build time. The build therefore couples
-/// the binary to a specific runtime version — `init` always stamps *this* one.
-const RUNTIME: &str = include_str!("../../_sporeAlpha.v0.2.md");
-const RUNTIME_FILENAME: &str = "_sporeAlpha.v0.2.md";
+/// the binary to a specific runtime version — `init` (and `refresh`) always
+/// stamp *this* one. The filename is frozen (`vault::RUNTIME_FILENAME`).
+pub const RUNTIME: &str = include_str!("../../_sporeAlpha.md");
 
 /// Runtime schemaVersion(s) this binary understands (for the handshake).
 const SUPPORTED_SCHEMA: &str = "1";
+
+/// Semantic version of the embedded runtime, from its `version:` frontmatter.
+pub fn embedded_runtime_version() -> Result<String> {
+    crate::frontmatter::get(RUNTIME, "version").ok_or_else(|| {
+        SporeError::new(
+            ErrKind::State,
+            "embedded runtime carries no `version:` frontmatter (build defect)".to_string(),
+        )
+    })
+}
 
 pub fn print_version() {
     println!("spore {}", env!("CARGO_PKG_VERSION"));
     println!("runtime-file: {}", RUNTIME_FILENAME);
     println!("runtime-schema: {}", SUPPORTED_SCHEMA);
+    println!(
+        "runtime-version: {}",
+        embedded_runtime_version().map_or_else(|_| "unknown".to_string(), |v| v)
+    );
 }
 
 fn prompt(label: &str) -> Result<String> {

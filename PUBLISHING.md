@@ -9,18 +9,18 @@ spore-claudecode-plugin/
 ├── .claude-plugin/           ← the Claude Code plugin (slash commands)
 ├── skills/                   ← plugin skills
 ├── spore-helper/             ← the Rust crate (SEAM binary source) — synced from SporeSource
-├── _sporeAlpha.v0.2.md       ← the runtime — synced from SporeSource; the crate embeds it
+├── _sporeAlpha.md            ← the runtime — synced from SporeSource; the crate embeds it
 ├── install.sh                ← the one-command installer users curl
 ├── PUBLISHING.md             ← this file
 └── .github/workflows/release.yml
 ```
 
-`spore-helper/` and `_sporeAlpha.v0.2.md` are authored canonically in the **SporeSource
-workshop** (`build/sporeAlpha-v0.2/`). They are *synced* into this repo before a release
+`spore-helper/` and `_sporeAlpha.md` are authored canonically in the **SporeSource
+workshop** (`build/sporeAlpha-v0.3/`). They are *synced* into this repo before a release
 (same dual-source discipline as rules/personas). SporeSource stays the source of truth.
 
 **Why the runtime lives at the repo root:** the crate embeds it with
-`include_str!("../../_sporeAlpha.v0.2.md")` — a path that resolves to one level *above*
+`include_str!("../../_sporeAlpha.md")` — a path that resolves to one level *above*
 the crate, i.e. the repo root. Keep the two in step, or `cargo build` fails.
 
 ## One-time / per-release: sync the crate + runtime
@@ -28,22 +28,22 @@ the crate, i.e. the repo root. Keep the two in step, or `cargo build` fails.
 From the SporeSource workshop, copy both into the plugin repo (excluding build output):
 
 ```sh
-SRC=/path/to/SporeSource/build/sporeAlpha-v0.2
+SRC=/path/to/SporeSource/build/sporeAlpha-v0.3
 DST=/path/to/spore-claudecode-plugin
 
 rsync -a --delete --exclude target/ "$SRC/spore-helper/" "$DST/spore-helper/"
-cp "$SRC/_sporeAlpha.v0.2.md" "$DST/_sporeAlpha.v0.2.md"
+cp "$SRC/_sporeAlpha.md" "$DST/_sporeAlpha.md"
 ```
 
-Commit both. The crate's `Cargo.toml` version (currently `0.2.0`) is what ships.
+Commit both. The crate's `Cargo.toml` version (currently `0.3.0`) is what ships.
 
 ## Cut a release
 
 The version should match the runtime's `minHelper` and the binary's `Cargo.toml` version.
 
 ```sh
-git tag v0.2.0
-git push origin v0.2.0
+git tag v0.3.0
+git push origin v0.3.0
 ```
 
 That fires `.github/workflows/release.yml`, which:
@@ -62,7 +62,7 @@ The one-liner is live:
 curl -fsSL https://raw.githubusercontent.com/neuromance-admin/spore-claudecode-plugin/main/install.sh | sh
 ```
 
-`install.sh` resolves `releases/latest`, so it always fetches the newest tagged release. Pin a specific one with `SPORE_VERSION=v0.2.0`.
+`install.sh` resolves `releases/latest`, so it always fetches the newest tagged release. Pin a specific one with `SPORE_VERSION=v0.3.0`.
 
 ## Asset-name contract (don't break this)
 
