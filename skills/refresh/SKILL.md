@@ -1,18 +1,18 @@
 ---
 name: refresh
-description: Update this vault's runtime to the newer one the spore helper carries — backed up first, versions compared, nothing else touched
+description: Update this vault's runtime to the newer one the spore binary carries — backed up first, versions compared, nothing else touched
 disable-model-invocation: true
 ---
 
-The owner has invoked `/spore:refresh`. They are consenting to update this vault's runtime file to the runtime the `spore` helper carries baked in.
+The owner has invoked `/spore:refresh`. They are consenting to update this vault's runtime file to the runtime the `spore` binary carries baked in.
 
 Execute per the loaded sporeAlpha runtime's **§6 (Commands → `/spore:refresh` discipline)**:
 
-1. Run `spore refresh`. **The helper owns the entire file operation** — never hand-write runtime content yourself (Hard Floor #2). The helper compares the vault runtime's `version:` frontmatter against its embedded runtime, then:
+1. Run `spore refresh`. **The binary owns the entire file operation** — never hand-write runtime content yourself (Hard Floor #2). The binary compares the vault runtime's `version:` frontmatter against its embedded runtime, then:
    - **newer available** → backs up the current runtime (`_sporeAlpha.md.bak-<oldversion>`) and stamps the new one (atomic + read-back verified);
    - **already current** → no-op, nothing written;
-   - **vault ahead of the helper** → refuses (downgrade guard).
-2. **Relay the helper's outcome verbatim**: refreshed (old → new version, backup path, "applies next launch"), already current, or refused (direct the owner to update the `spore` helper via its installer first).
+   - **vault ahead of the binary** → refuses (downgrade guard).
+2. **Relay the binary's outcome verbatim**: refreshed (old → new version, backup path, "applies next launch"), already current, or refused (direct the owner to update the `spore` binary via its installer first).
 3. After a successful refresh, finish the current session normally on the runtime already in context — the **next launch** boots the new runtime (a seed; it re-slims to established form after boot, runtime §13).
 
 Refresh touches **only** the runtime file and its backup. `Map.md`, `Rules/`, `Sessions/`, `Inbox/`, and personas are never in scope.

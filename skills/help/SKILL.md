@@ -24,6 +24,7 @@ Once loaded, these commands are available:
   /spore:rules       — view or manage this vault's rules
   /spore:inbox       — work this vault's Inbox
   /spore:map-rebuild — rebuild the Map from session history
-  /spore:refresh     — update this vault's runtime to the one the helper carries
+  /spore:audit       — vault hygiene audit (read-only; fixes only on consent)
+  /spore:refresh     — update this vault's runtime to the one the binary carries
   /spore:help        — this help
 ```

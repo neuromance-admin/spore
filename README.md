@@ -2,7 +2,7 @@
 
 Markdown-based AI memory harness for Claude Code — locally-owned, plain-text vaults. This repo is the whole distribution: the **`spore` binary** (a small local binary — the substrate seam), the **runtime** (`_sporeAlpha.md`, the doctrine each vault carries), the one-command **installer**, and the **plugin** that surfaces the `/spore:*` slash commands. Obsidian is an optional Markdown viewer, not a requirement.
 
-This plugin provides six namespaced slash commands:
+This plugin provides seven namespaced slash commands:
 
 | Command | What it does |
 |---|---|
@@ -10,10 +10,13 @@ This plugin provides six namespaced slash commands:
 | `/spore:rules` | View or manage this vault's rules |
 | `/spore:inbox` | Work this vault's Inbox: list contents, propose filing |
 | `/spore:map-rebuild` | Rebuild the Map from session history (with ⏸ preview) |
+| `/spore:audit` | Vault hygiene audit — read-only workers sweep for duplicate concepts, broken wikilinks, Map drift, schema gaps, stale open loops; report in chat, fixes only on consent |
 | `/spore:refresh` | Update this vault's runtime to the one the `spore` binary carries (backup first; no-op when current; refuses downgrade) |
 | `/spore:help` | Show the command list, with a state-aware header |
 
 Each command is a thin trigger that delegates to the doctrine in the runtime markdown file (`_sporeAlpha.md`) at your vault's root.
+
+**The memory pipeline (v0.4):** for heavy memory work — the audit, and big saves — the runtime's §8.8 lets the session AI fan out read-only **workers** (the bundled `spore-worker` agent definition). Workers are propose-only and never talk to you directly; everything funnels through the session AI's judgment into one consent-gated write plan. The agent definition pins the worker's model and tool surface; the doctrine stays in the runtime. No worker machinery available → everything runs inline instead, exactly as before.
 
 ## Architecture
 
@@ -28,7 +31,7 @@ The plugin commands assume the runtime is in context. If it isn't, the commands 
 
 - The **`spore` binary** installed on PATH (via the install bootstrap — the per-user foundation, once). This is the substrate seam the runtime drives.
 - **Claude Code** (Max plan recommended).
-- The **sporeAlpha runtime file** (`_sporeAlpha.md`, v0.3.0 or later) at the root of a vault — stamped by `spore init`.
+- The **sporeAlpha runtime file** (`_sporeAlpha.md`, v0.3.0 or later; v0.4.0+ for the memory pipeline / `/spore:audit`) at the root of a vault — stamped by `spore init`.
 - **Obsidian is optional** — a nice Markdown viewer for the graph/backlinks, but nothing requires it.
 
 ## Installation
@@ -68,7 +71,7 @@ Then create a vault with `spore init ~/path/to/MyVault` and hand the runtime to 
 
 ## See also
 
-- Runtime source: `_sporeAlpha.md` (in any vault you've Spore-ified) — the complete doctrine, ~1091 lines, §1–§13 + Changelog.
+- Runtime source: `_sporeAlpha.md` (in any vault you've Spore-ified) — the complete doctrine, ~1155 lines, §1–§13 + Changelog.
 - Seam binary source: the `spore-binary/` crate in this repo (authored canonically in the upstream `SporeSource` workshop).
 - Design rationale: the upstream `SporeSource` repo.
 

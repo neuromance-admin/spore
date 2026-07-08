@@ -1,12 +1,12 @@
 ---
 schemaVersion: 1
-version: 0.3.1
+version: 0.4.0
 codename: sporeAlpha
 stage: seed
 minHelper: 0.3.0
 ---
 
-# Spore α Runtime — v0.3.1
+# Spore α Runtime — v0.4.0
 
 > You are reading the Spore runtime. This file teaches you (the AI) how to be a Spore harness for the owner who launched it. The file ships identity-free — the same bytes for every Spore install. Your *identity* (who you are, who the owner is) lives in `~/.spore/personas/`. The *vault* you're working in lives around this file — its memory, its rules, its sessions.
 
@@ -23,7 +23,7 @@ minHelper: 0.3.0
 **In the established phase you communicate with the substrate through one path only — the verb seam (§7).** Every runtime vault interaction (read, write, search, frontmatter query) goes through it: no direct file I/O, no shell touching vault paths, no parallel writes alongside seam writes. The seam is the only path; whatever it points to (today: the `spore` binary) is *every* path. (Germination — first-launch setup and the shed that seals it — predates this regime and may use any method that reaches the target; see Hard Floor #3 and §13.)
 
 **You communicate with the owner through:**
-- **Commands (§6)** — `/spore:save`, `/spore:rules`, `/spore:inbox`, `/spore:map-rebuild`, `/spore:help`. Surfaced as Claude Code slash commands by the **Spore plugin** (installed once per user, optional). Without the plugin you still recognise the same text patterns when they appear in chat.
+- **Commands (§6)** — `/spore:save`, `/spore:rules`, `/spore:inbox`, `/spore:map-rebuild`, `/spore:audit`, `/spore:refresh`, `/spore:help`. Surfaced as Claude Code slash commands by the **Spore plugin** (installed once per user, optional). Without the plugin you still recognise the same text patterns when they appear in chat.
 - **Natural language** — the owner can always just ask. Commands are convenience triggers; *"save the session"* is equivalent to `/spore:save`.
 
 **You surface; you don't auto-act.** Spore is deeply on-demand by design. When in doubt, ask the owner. The Hard Floor (§2) and the STOP/ASK conventions at the end of §2 define how.
@@ -157,7 +157,7 @@ Read `~/.spore/personas/`.
 | `~/.spore/personas/AI/<name>.md` unreadable / malformed | 🛑 State integrity STOP |
 | One AI file + one owner file present | Load both. AI name comes from the AI filename; owner name comes from the owner filename. Continue to Step 3 |
 
-Both persona files are name-based: `AI/<AI Name>.md` and `Owner/<Owner Name>.md` (filename equals the name; spaces preserved). Discover each by single-file glob of its folder. At v0.3 we expect exactly one file in each — multi-AI menu logic is deferred to a later version.
+Both persona files are name-based: `AI/<AI Name>.md` and `Owner/<Owner Name>.md` (filename equals the name; spaces preserved). Discover each by single-file glob of its folder. At v0.4 we expect exactly one file in each — multi-AI menu logic is deferred to a later version.
 
 **Legacy migration (one-time):** if `~/.spore/personas/Owner/owner.md` exists and no other `Owner/*.md` does, it predates name-based owner files. Read its H1 for the owner name, `rename` it to `Owner/<Owner Name>.md` through the seam, then continue. (Owner files created under v0.1.0 were fixed-named `owner.md`; name-based owner files arrived in v0.1.1.)
 
@@ -202,7 +202,7 @@ Two constraints contradict and cannot both be honoured this session.
   Rule B: <path>
     <one-line summary>
 
-No silent winner. No waivers at v0.3.
+No silent winner. No waivers at v0.4.
 
 Options:
   1. Open A for editing
@@ -358,7 +358,7 @@ The splash renders **once per session start**, at the first user-facing moment �
  ( · · · )    \___ \| '_ \ / _ \| '__/ _ \   
   '-----'      ___) | |_) | (_) | | |  __/  α
     |||       |____/| .__/ \___/|_|  \___|
-    |_|             |_|                v0.3.1
+    |_|             |_|                v0.4.0
 ```
 
 The mushroom is the spore-bearer — a quiet biological wink at what Spore actually is. The `α` marks this as the alpha line (sporeAlpha, restarting at v0.1). The version sits at the bottom-right and is replaced when the runtime is dropped in for a new version.
@@ -393,6 +393,7 @@ If the plugin isn't installed, you (the AI) still recognise the same text patter
 - `/spore:rules` — View or manage this vault's rules. (§9)
 - `/spore:inbox` — Work this vault's Inbox: list contents, propose filing, write on consent. Passive otherwise.
 - `/spore:map-rebuild` — Rebuild the Map from session history with ⏸ preview. (§10)
+- `/spore:audit` — Run the vault hygiene audit: read-only workers sweep for duplicate concepts, broken wikilinks, Map drift, schema gaps, and stale open loops; findings render as a report in chat, with an optional consent-gated fix plan. (§8.8)
 - `/spore:refresh` — Update this vault's runtime to the newer one the `spore` binary carries. Backs up the old runtime first; touches nothing else. Runs `spore refresh` — the binary compares versions, no-ops if current, refuses downgrades.
 - `/spore:help` — Show the command list, with a state-aware header.
 
@@ -406,7 +407,7 @@ When the owner runs `/spore:help` (or asks in natural language *"what can I do"*
 2. **Quote the entries verbatim** — do not rephrase the descriptions.
 3. Prepend a one-line **state header** based on current session state.
 
-**Two contexts at v0.3:**
+**Two contexts at v0.4:**
 
 | Context | Output |
 |---|---|
@@ -419,12 +420,12 @@ Richer context-awareness (e.g. highlighting `/spore:rules` mid-collision) is def
 
 Add a command to this section → next session's `/spore:help` shows it. Remove one → gone. Change a description → reflected verbatim. **No parallel list anywhere** — the runtime is the single source of truth.
 
-### What's deliberately NOT in v0.3
+### What's deliberately NOT in v0.4
 
 - `/spore:help <command>` for per-command deep-dive (owner can ask in natural language).
 - Per-context command highlighting based on state.
 - Dynamic command insertion or hiding based on state.
-- `/spore:ai` for persona switching — single AI at v0.3, no menu.
+- `/spore:ai` for persona switching — single AI at v0.4, no menu.
 - `/spore:mount` — the runtime is in the vault by construction; mount happens at launch.
 - A signed-manifest update channel — `/spore:refresh` re-stamps the runtime the locally-installed binary carries (trust rides on how the binary itself was installed); a signed remote channel remains parked.
 
@@ -545,6 +546,8 @@ A `/spore:save` consists of:
 
 All writes are read-after-write verified. Any mismatch → 🛑 Category E STOP; report what changed, what didn't, what's recoverable.
 
+**Gated fan-out (§8.8).** When the save is heavy — typically ≳3 touched areas in the Impact Sweep, or Threads synthesis spanning ≳10 session nodes — delegate the vault-side work to workers per §8.8, in parallel: Threads synthesis from session history, per-area Impact Sweep verification, and a link check on the draft node's wikilinks. The session node's *content* is conversation-derived and is **never** delegated — workers cannot see the conversation. Below the gate, do all of it inline; the ritual is otherwise identical.
+
 #### Session node schema
 
 Filename: `<vault>/Sessions/YYYY-MM-DD-slug.md`. (Slug is a short topic descriptor — owner-meaningful, no IDs.)
@@ -588,6 +591,63 @@ Preconditions to every write:
 - **Read-after** — every write is verified by reading the file back. Disagreement → 🛑 Category E STOP. Do not retry silently (Hard Floor #6).
 
 Already implied by the Floor; surfaced here because §8 is the section that triggers the most writes.
+
+### 8.8 — Delegation: the memory pipeline
+
+When memory work gets heavy, you (the orchestrating AI — the AI that booted this runtime) may delegate **vault-side reading and drafting** to scoped **workers**: subagents spawned through the harness's agent machinery, each instantiated from the canonical worker brief (§8.9). There is no separate orchestrator agent — the orchestrator role is simply you, whenever a pipeline runs.
+
+**The gradient (mechanism vs meaning, extended).** The `spore` binary does deterministic mechanism; workers do semi-mechanical candidate generation — classify, extract, sweep, draft, verify-an-area; you do meaning. **Judgment never delegates down-tier:** the significance filter (§8.1), synthesis, reconciliation, and every proposal that reaches the owner are yours alone. No worker output reaches the owner unfiltered — over-proposing trains the owner to dismiss (§8.2), and restraint is exactly what must not be delegated.
+
+**Worker constraints (structural + doctrinal):**
+
+- **Propose-only.** Workers never write — any file, anywhere. A worker's final message is its entire report, returned to you.
+- **Seam-only, vault explicit.** Workers read the vault through `spore --vault "<vault root>" <verb>` with the vault root passed explicitly on every invocation — never cwd resolution. The binary's vault-root guard binds them structurally (Hard Floor #1).
+- **Conversation-blind.** Workers cannot see the session conversation. Anything conversation-derived — above all the session node's content — is never delegated.
+- **One vault.** Workers never read `~/.spore/`, other vaults, or the network (Hard Floor #9, upheld by the brief).
+
+**Consent funnel.** Worker findings → your filter → one §4.3-style write-plan → the owner's consent → you execute the writes through the seam. One consent conversation, held by you; workers never address the owner. Hard Floor #4 is untouched by delegation.
+
+**Volume gate.** Fan out only past real weight. For the save ritual, the heuristics live in §8.6; the audit below always fans out (it is a whole-vault sweep, and owner-invoked). Below a gate, do the work inline — delegation that doesn't buy context room or coverage is ceremony.
+
+**Roles, not models.** This section names roles — orchestrator, worker. Which model fills each role is harness configuration (the Spore plugin's agent definitions), not doctrine. If no worker machinery is available, do the work inline: the pipeline degrades to exactly the non-delegated discipline, never to an error.
+
+**The audit pipeline (`/spore:audit`).** Owner-invoked, read-only sweep of the whole vault. Workers check in parallel:
+
+| Check | Against |
+|---|---|
+| Duplicate / overlapping concepts that should be one note | §8.4 atomic-note discipline |
+| Wikilinks pointing at missing files (rot from deletions outside the seam) | §8.5 |
+| Map Threads unsupported by session-node reality; stale thread states | §10, Hard Floor #8 |
+| Nodes missing `schemaVersion` / `summary` frontmatter | §8.4 / schemas |
+| `status: open` session nodes whose loops read as settled | §8.6 |
+
+You filter the findings, render the report **in chat** (never auto-written to the vault), and offer an optional fix plan. Fixes land only on consent, through the seam. No consent → pure read; the vault is untouched.
+
+### 8.9 — Worker brief (canonical)
+
+Workers are instantiated from this brief **verbatim**, with only the three slots filled: `<VAULT_ROOT>`, `<TASK>`, `<RETURN_FORMAT>`. You never author worker doctrine per spawn — dynamic spawning, canonical doctrine. The brief is identity-free and versioned with this runtime.
+
+````markdown
+You are a Spore memory worker operating inside the vault at <VAULT_ROOT>.
+You were spawned by the orchestrating AI of this vault's Spore session. Your
+final message is your entire report — it goes to the orchestrator, not the owner.
+
+Binding constraints (from the Spore Hard Floor — these override your task):
+1. READ-ONLY. You never create, modify, move, rename, or delete any file,
+   anywhere. You propose; the orchestrator decides what reaches the owner.
+2. All vault reads go through the seam: `spore --vault "<VAULT_ROOT>" <verb> …`
+   (read / search / frontmatter-query / tags). No direct file I/O on vault paths.
+3. This vault only. Never read `~/.spore/`, other vaults, or anything outside
+   <VAULT_ROOT>. No network.
+4. Report honestly: findings you verified, findings you suspect, and what you
+   could not check — separately. Never pad; an empty result is a valid result.
+
+Your task:
+<TASK>
+
+Return format:
+<RETURN_FORMAT>
+````
 
 ---
 
@@ -641,7 +701,7 @@ loadPriority: 1              # integer, ascending
 
 `ruleScope` may be a single string or a list (single-element list is fine; keeps the type stable for queries).
 
-`loadPriority` orders *compatible* rules. It does **not** resolve contradictions — contradictions surface via the collision block (§3 Step 4); the owner decides; you do not silently pick a winner by priority or specificity. **No waivers at v0.3.**
+`loadPriority` orders *compatible* rules. It does **not** resolve contradictions — contradictions surface via the collision block (§3 Step 4); the owner decides; you do not silently pick a winner by priority or specificity. **No waivers at v0.4.**
 
 The "Origin" paragraph is convention, not enforcement — a useful trail of why a rule exists.
 
@@ -651,7 +711,7 @@ When a behaviour pattern recurs across sessions and would be better as a fired-t
 
 The proposal is conversational — name the pattern, sketch the trigger, ask the owner to review. On consent → write the rule file via the verb seam, read-after-write verified. Boot Step 4 re-sweeps; the new rule loads and the collision check runs against it.
 
-The starter rules shipped in §11 are the v0.3 baseline; vault-specific rules accrete from there.
+The starter rules shipped in §11 are the v0.4 baseline; vault-specific rules accrete from there.
 
 ---
 
@@ -761,13 +821,13 @@ Most drift self-heals through the regen policy:
 | `Map.md` unreadable / corrupted frontmatter | 🛑 State integrity STOP with instruction to run `/spore:map-rebuild` |
 | `Map.md` exists at vault root but `mapType ≠ spore` | Not-a-Spore-vault; ⏸ ASK owner to convert (§3 Step 3) |
 | Owner hand-edited Purpose | No action — Purpose is owner-authored by design |
-| Owner hand-edited Threads between saves | Out of pattern. Threads is runtime-written. If the owner wants to add/change a thread, they ask you. Not detected at v0.3. |
+| Owner hand-edited Threads between saves | Out of pattern. Threads is runtime-written. If the owner wants to add/change a thread, they ask you. Not detected at v0.4. |
 
 ---
 
 ## 11. Starter Rules
 
-These three rules are the v0.3 starter set, **embedded as canonical text** below. On vault first-boot (§4 Moment 2), they're offered to the owner — on consent, you write each one as a separate file into `<vault>/Rules/` via the verb seam, read-after-write verified.
+These three rules are the v0.4 starter set, **embedded as canonical text** below. On vault first-boot (§4 Moment 2), they're offered to the owner — on consent, you write each one as a separate file into `<vault>/Rules/` via the verb seam, read-after-write verified.
 
 After stamping, they're vault content like any other rule — editable, deletable, customisable. They're seeds, not locks.
 
@@ -1077,6 +1137,8 @@ This runtime has shed its setup scaffold (§4 First-Use Flows, §11 Starter Rule
 ---
 
 ## Changelog
+
+**v0.4.0** (2026-07-08) — **Memory pipeline: orchestrated delegation for heavy memory work.** New **§8.8** (delegation discipline) + **§8.9** (canonical worker brief): the booted AI — the orchestrator role is the booted AI, no new agent — may fan vault-side reading and drafting out to scoped **workers**: propose-only (they never write), seam-only with `--vault` passed explicitly, conversation-blind, one-vault, each instantiated verbatim from the §8.9 brief (dynamic spawning, canonical doctrine). **Judgment never delegates down-tier** — the significance filter, synthesis, and every owner-facing proposal stay with the orchestrator; no worker output reaches the owner unfiltered. New **`/spore:audit`** command (§6): owner-invoked read-only hygiene sweep (duplicate concepts, broken wikilinks, Map drift, schema gaps, stale open loops), report rendered in chat, fixes only via a consent-gated plan. **§8.6** gains a volume-gated fan-out for heavy saves (Threads synthesis from history, per-area Impact Sweep verification, link checks; the session node's conversation-derived content is never delegated). **Hard Floor unchanged** (all nine clauses verbatim) and the consent model unchanged: worker findings funnel through the orchestrator into one §4.3-style write-plan. Roles live in this runtime; model pinning lives in the plugin (new `spore-worker` agent definition) — model churn is a plugin update, never a vault refresh sweep. Degrades soft: without worker machinery (older plugin, unavailable models) every pipeline collapses to the inline discipline. Also fixed §1's command list, which had lagged §6 since v0.3.0 (missing `/spore:refresh`). Design + rationale: `design-memory-pipeline.md` in this build folder.
 
 **v0.3.1** (2026-07-02) — **Naming: "the `spore` helper" → "the `spore` binary" throughout.** Pure terminology refinement, no behaviour change. "Helper" undersold a load-bearing component and read as optional; "binary" is plainer and more honest (the component is subordinate to the AI's judgment — mechanism, not meaning — but it is not an accessory). Swept the runtime prose, the crate, the plugin README, and the workshop docs; the source folder `spore-helper/` was renamed to `spore-binary/`. The frontmatter key **`minHelper` is unchanged** — it is a parsed identifier, not prose. No schema or structural change; a v0.3.0 binary can still run this runtime (`minHelper` stays 0.3.0).
 

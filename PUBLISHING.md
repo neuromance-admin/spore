@@ -16,7 +16,7 @@ spore/
 ```
 
 `spore-binary/` and `_sporeAlpha.md` are authored canonically in the **SporeSource
-workshop** (`build/sporeAlpha-v0.3/`). They are *synced* into this repo before a release
+workshop** (`build/sporeAlpha-v0.4/`). They are *synced* into this repo before a release
 (same dual-source discipline as rules/personas). SporeSource stays the source of truth.
 
 **Why the runtime lives at the repo root:** the crate embeds it with
@@ -28,22 +28,22 @@ the crate, i.e. the repo root. Keep the two in step, or `cargo build` fails.
 From the SporeSource workshop, copy both into the plugin repo (excluding build output):
 
 ```sh
-SRC=/path/to/SporeSource/build/sporeAlpha-v0.3
+SRC=/path/to/SporeSource/build/sporeAlpha-v0.4
 DST=/path/to/spore
 
 rsync -a --delete --exclude target/ "$SRC/spore-binary/" "$DST/spore-binary/"
 cp "$SRC/_sporeAlpha.md" "$DST/_sporeAlpha.md"
 ```
 
-Commit both. The crate's `Cargo.toml` version (currently `0.3.0`) is what ships.
+Commit both. The crate's `Cargo.toml` version (currently `0.4.0`) is what ships.
 
 ## Cut a release
 
-The version should match the runtime's `minHelper` and the binary's `Cargo.toml` version.
+The tag matches the binary's `Cargo.toml` version (which matches the embedded runtime's `version:`; `minHelper` may lag — it is a compatibility floor, not the release number).
 
 ```sh
-git tag v0.3.0
-git push origin v0.3.0
+git tag v0.4.0
+git push origin v0.4.0
 ```
 
 That fires `.github/workflows/release.yml`, which:
