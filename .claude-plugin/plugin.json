@@ -1,7 +1,7 @@
 {
   "name": "spore",
   "displayName": "Spore α",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Spore α — Markdown-based AI memory harness. Surfaces seven slash commands that delegate to doctrine in the per-vault runtime markdown file, plus the spore-worker agent for the memory pipeline.",
   "author": {
     "name": "NeuromanceCo",
